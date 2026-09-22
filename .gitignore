@@ -9,3 +9,6 @@ Icon[]
 
 # AEM build stuff
 install/
+license.properties
+password.properties
+aem*.jar
