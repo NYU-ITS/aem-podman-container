@@ -5,3 +5,7 @@ __MACOSX/
 .AppleDouble
 .LSOverride
 Icon[]
+
+
+# AEM build stuff
+install/
