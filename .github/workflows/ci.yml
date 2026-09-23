@@ -77,7 +77,7 @@ jobs:
 
       # Authenticate to AWS (Only runs if the JAR isn't already cached)
       - name: Configure AWS Credentials
-        if: steps.cache-aem.outputs.cache-hit != 'true'
+        if: steps.cache-aem.outputs.cache-hit != 'true' || steps.cache-dispatcher.outputs.cache-hit != 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
