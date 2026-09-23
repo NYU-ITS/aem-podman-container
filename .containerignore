@@ -1,0 +1,6 @@
+crx-quickstart/
+logs/
+target/
+*.log
+.git
+.DS_Store
