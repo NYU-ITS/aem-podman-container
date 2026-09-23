@@ -66,6 +66,15 @@ jobs:
           # If you upgrade AEM versions, change this key to bust the cache (e.g., aem-jar-6.5.1)
           key: aem-jar-6.5.0
 
+      # --- CACHE & DOWNLOAD dispatcher module ---
+      - name: Cache dispatcher module
+        id: cache-dispatcher
+        uses: actions/cache@v4
+        with:
+          path: dispatcher/modules/dispatcher-apache2.4.so
+          # If you upgrade AEM versions, change this key to bust the cache (e.g., aem-jar-6.5.1)
+          key: dispatcher-apache2.4-4.3.8
+
       # Authenticate to AWS (Only runs if the JAR isn't already cached)
       - name: Configure AWS Credentials
         if: steps.cache-aem.outputs.cache-hit != 'true'
@@ -79,9 +88,15 @@ jobs:
       - name: Download AEM JAR from S3
         if: steps.cache-aem.outputs.cache-hit != 'true'
         run: |
-          # UPDATE YOUR BUCKET URL HERE:
           aws s3 cp s3://aem-s3-resources-bucket-653714463152-us-east-2-an/AEM_6.5_Quickstart.jar AEM_6.5_Quickstart.jar
           ls -lh AEM_6.5_Quickstart.jar
+
+      # Download from S3 (Only runs if the JAR isn't already cached)
+      - name: Download dispatcher module from S3
+        if: steps.cache-dispatcher.outputs.cache-hit != 'true'
+        run: |
+          aws s3 cp s3://aem-s3-resources-bucket-653714463152-us-east-2-an/dispatcher-apache2.4-4.3.8.so dispatcher/modules/dispatcher-apache2.4.so
+          ls -lh dispatcher/modules/dispatcher-apache2.4.so
 
       # Start the rootless Podman API socket daemon in CI
       - name: Start Podman API Socket
