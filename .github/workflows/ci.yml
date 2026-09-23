@@ -18,7 +18,7 @@ jobs:
       - name: Lint Containerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: Containerfile
+          dockerfile: containerfile
 
       # 2. Install podman-compose and validate compose configuration
       - name: Install podman-compose
