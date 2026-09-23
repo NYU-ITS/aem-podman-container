@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: hadolint
         name: Lint Containerfile
-        files: Containerfile$
+        files: containerfile$
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
