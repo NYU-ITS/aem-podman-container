@@ -12,3 +12,6 @@ install/
 license.properties
 password.properties
 aem*.jar
+
+# Dispatcher module
+dispatcher*.so
