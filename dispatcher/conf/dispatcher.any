@@ -1,0 +1,31 @@
+/far {
+  /clientheaders {
+    "*"
+  }
+  /virtualhosts {
+    "*"
+  }
+  /renders {
+    /rend01 {
+      # Points directly to the container name in podman-compose
+      /hostname "aem-publish"
+      /port "4503"
+      /timeout "0"
+    }
+  }
+  /filter {
+    /0001 { /type "deny"  /glob "*" }
+    /0002 { /type "allow" /glob "GET /content*" }
+    /0003 { /type "allow" /glob "GET /etc*" }
+    /0004 { /type "allow" /glob "GET /libs/granite/core/content/login.html*" }
+    /0005 { /type "allow" /glob "POST /libs/granite/core/content/login/token*" }
+  }
+  /cache {
+    /docroot "/usr/local/apache2/htdocs/cache"
+    /statfileslevel "2"
+    /allowAuthorized "0"
+    /rules {
+      /0000 { /glob "*" /type "allow" }
+    }
+  }
+}
