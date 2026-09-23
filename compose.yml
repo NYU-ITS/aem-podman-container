@@ -1,46 +1,40 @@
-
 services:
   # -------------------------------------------------------------------
-  # AEM AUTHOR INSTANCE
+  # AEM AUTHOR
   # -------------------------------------------------------------------
   aem-author:
     build:
       context: .
-      dockerfile: containerfile.new
+      dockerfile: containerfile
+      args:
+        RUN_MODE: author
+        PORT: 4502
     container_name: aem-author
     ports:
-      - "4502:4502"   # Web UI
-      - "30333:30333" # Remote Debugging
+      - "4502:4502"
+      - "30333:30333"
     environment:
       - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dsling.run.modes=author -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30333
     command: ["-p", "4502", "-nofork"]
     volumes:
-      # Named volumes allow entrypoint.sh to seed data on first launch
       - aem-author-repo:/opt/aem/crx-quickstart/repository:Z
       - aem-author-logs:/opt/aem/crx-quickstart/logs:Z
       - ./install/author:/opt/aem/crx-quickstart/install:Z
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4502/system/console/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 1m  # Reduced from 4m because warm-boot is significantly faster
-    deploy:
-      resources:
-        limits:
-          memory: 6g
 
   # -------------------------------------------------------------------
-  # AEM PUBLISH INSTANCE
+  # AEM PUBLISH
   # -------------------------------------------------------------------
   aem-publish:
     build:
       context: .
-      dockerfile: containerfile.new
+      dockerfile: containerfile
+      args:
+        RUN_MODE: publish
+        PORT: 4503
     container_name: aem-publish
     ports:
-      - "4503:4503"   # Web UI
-      - "30334:30334" # Remote Debugging
+      - "4503:4503"
+      - "30334:30334"
     environment:
       - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dsling.run.modes=publish -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30334
     command: ["-p", "4503", "-nofork"]
@@ -48,20 +42,7 @@ services:
       - aem-publish-repo:/opt/aem/crx-quickstart/repository:Z
       - aem-publish-logs:/opt/aem/crx-quickstart/logs:Z
       - ./install/publish:/opt/aem/crx-quickstart/install:Z
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4503/system/console/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 1m
-    deploy:
-      resources:
-        limits:
-          memory: 4g
 
-# -------------------------------------------------------------------
-# PERSISTENT VOLUMES
-# -------------------------------------------------------------------
 volumes:
   aem-author-repo:
   aem-author-logs:
