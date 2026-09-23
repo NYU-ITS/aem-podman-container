@@ -1,0 +1,4 @@
+ignored:
+  - DL3008  # Pin versions in apt-get install
+  - DL3001  # Do not use delete commands or specific inline commands
+  - DL3066  # Specify option or instruction rules
