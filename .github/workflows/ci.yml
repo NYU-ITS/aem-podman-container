@@ -83,6 +83,12 @@ jobs:
           aws s3 cp s3://aem-s3-resources-bucket-653714463152-us-east-2-an/AEM_6.5_Quickstart.jar AEM_6.5_Quickstart.jar
           ls -lh AEM_6.5_Quickstart.jar
 
+      # Start the rootless Podman API socket daemon in CI
+      - name: Start Podman API Socket
+        run: |
+          systemctl --user enable --now podman.socket
+          echo "DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock" >> $GITHUB_ENV
+
       # 3. Build containers locally without pushing to a registry
       - name: Build and Start Containers
         run: podman compose up -d --build
