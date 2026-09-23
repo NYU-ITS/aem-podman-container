@@ -5,6 +5,7 @@
   /virtualhosts {
     "*"
   }
+  # backend routing - tells apache where AEM instances live
   /renders {
     /rend01 {
       # Points directly to the container name in podman-compose
@@ -13,6 +14,7 @@
       /timeout "0"
     }
   }
+  # security and request filtering
   /filter {
     /0001 { /type "deny"  /glob "*" }
     /0002 { /type "allow" /glob "GET /content*" }
@@ -21,6 +23,7 @@
     /0005 { /type "allow" /glob "POST /libs/granite/core/content/login/token*" }
   }
   /cache {
+    # defines wehre disk cached HTML, CSS, JS, and image files are
     /docroot "/usr/local/apache2/htdocs/cache"
     /statfileslevel "2"
     /allowAuthorized "0"
