@@ -43,8 +43,24 @@ services:
       - aem-publish-logs:/opt/aem/crx-quickstart/logs:Z
       - ./install/publish:/opt/aem/crx-quickstart/install:Z
 
+  # -------------------------------------------------------------------
+  # AEM DISPATCHER (Apache Web Server)
+  # -------------------------------------------------------------------
+  dispatcher:
+    build:
+      context: ./dispatcher
+      dockerfile: containerfile
+    container_name: aem-dispatcher
+    ports:
+      - "8080:80"  # Mapped to 8080 locally to avoid root port conflicts on Mac
+    depends_on:
+      - aem-publish
+    volumes:
+      - dispatcher-cache:/usr/local/apache2/htdocs/cache:Z
+
 volumes:
   aem-author-repo:
   aem-author-logs:
   aem-publish-repo:
   aem-publish-logs:
+  dispatcher-cache:

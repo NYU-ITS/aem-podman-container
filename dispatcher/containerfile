@@ -8,8 +8,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy dispatcher module and configurations
 COPY modules/dispatcher*.so /usr/local/apache2/modules/mod_dispatcher.so
-COPY conf/httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY conf/dispatcher.any /usr/local/apache2/conf/dispatcher.any
+COPY conf/dispatcher.conf /usr/local/apache2/conf/extra/dispatcher.conf
+
+# Include custom dispatcher config into Apache's main httpd.conf
+RUN echo "Include conf/extra/dispatcher.conf" >> /usr/local/apache2/conf/httpd.conf
 
 # Create cache directory and grant write permissions to Apache daemon
 RUN mkdir -p /usr/local/apache2/htdocs/cache && \

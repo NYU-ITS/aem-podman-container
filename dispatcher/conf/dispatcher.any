@@ -1,34 +1,40 @@
-/far {
-  /clientheaders {
-    "*"
-  }
-  /virtualhosts {
-    "*"
-  }
-  # backend routing - tells apache where AEM instances live
-  /renders {
-    /rend01 {
-      # Points directly to the container name in podman-compose
-      /hostname "aem-publish"
-      /port "4503"
-      /timeout "0"
+/farms {
+    /publishfarrm {
+        /clientheaders {
+            "*"
+        }
+        /virtualhosts {
+            "*"
+        }
+        # backend routing - tells apache where AEM instances live
+        /renders {
+            /rend01 {
+            # Points directly to the container name in podman-compose
+            /hostname "aem-publish"
+            /port "4503"
+            /timeout "0"
+            }
+        }
+        # security and request filtering
+        /filter {
+            /0001 { /type "deny"  /method "*" /url "*" }
+            /0002 { /type "allow" /method "GET" /url "/content*" }
+            /0003 { /type "allow" /method "GET" /url "/etc.clientlibs*" }
+            /0004 { /type "allow" /method "GET" /url "/libs/granite/core/content/login*" }
+            /0005 { /type "allow" /method "GET" /url "/libs/granite/csrf/token.json*" }
+            /0006 { /type "allow" /method "POST" /url "*/j_security_check*" }
+            /0007 { /type "allow" /method "GET" /url "/" }
+            /0008 { /type "allow" /method "GET" /url "/index.html*" }
+            /0009 { /type "allow" /method "GET" /url "/system/console*" }
+        }
+        /cache {
+            # defines wehre disk cached HTML, CSS, JS, and image files are
+            /docroot "/usr/local/apache2/htdocs/cache"
+            /statfileslevel "2"
+            /allowAuthorized "0"
+            /rules {
+            /0000 { /glob "*" /type "allow" }
+            }
+        }
     }
-  }
-  # security and request filtering
-  /filter {
-    /0001 { /type "deny"  /glob "*" }
-    /0002 { /type "allow" /glob "GET /content*" }
-    /0003 { /type "allow" /glob "GET /etc*" }
-    /0004 { /type "allow" /glob "GET /libs/granite/core/content/login.html*" }
-    /0005 { /type "allow" /glob "POST /libs/granite/core/content/login/token*" }
-  }
-  /cache {
-    # defines wehre disk cached HTML, CSS, JS, and image files are
-    /docroot "/usr/local/apache2/htdocs/cache"
-    /statfileslevel "2"
-    /allowAuthorized "0"
-    /rules {
-      /0000 { /glob "*" /type "allow" }
-    }
-  }
 }
