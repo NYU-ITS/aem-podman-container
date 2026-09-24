@@ -21,46 +21,6 @@ services:
       - aem-author-logs:/opt/aem/crx-quickstart/logs:Z
       - ./install/author:/opt/aem/crx-quickstart/install:Z
 
-  # -------------------------------------------------------------------
-  # AEM PUBLISH
-  # -------------------------------------------------------------------
-  aem-publish:
-    build:
-      context: .
-      dockerfile: containerfile
-      args:
-        RUN_MODE: publish
-        PORT: 4503
-    container_name: aem-publish
-    ports:
-      - "4503:4503"
-      - "30334:30334"
-    environment:
-      - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dsling.run.modes=publish -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30334
-    command: ["-p", "4503", "-nofork"]
-    volumes:
-      - aem-publish-repo:/opt/aem/crx-quickstart/repository:Z
-      - aem-publish-logs:/opt/aem/crx-quickstart/logs:Z
-      - ./install/publish:/opt/aem/crx-quickstart/install:Z
-
-  # -------------------------------------------------------------------
-  # AEM DISPATCHER (Apache Web Server)
-  # -------------------------------------------------------------------
-  dispatcher:
-    build:
-      context: ./dispatcher
-      dockerfile: containerfile
-    container_name: aem-dispatcher
-    ports:
-      - "8080:80"  # Mapped to 8080 locally to avoid root port conflicts on Mac
-    depends_on:
-      - aem-publish
-    volumes:
-      - dispatcher-cache:/usr/local/apache2/htdocs/cache:Z
-
 volumes:
   aem-author-repo:
   aem-author-logs:
-  aem-publish-repo:
-  aem-publish-logs:
-  dispatcher-cache:
