@@ -5,7 +5,7 @@ FROM eclipse-temurin:11-jdk-jammy AS builder
 ARG RUN_MODE=author
 ARG PORT=4502
 
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/aem
 

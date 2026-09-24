@@ -15,3 +15,6 @@ aem*.jar
 
 # Dispatcher module
 dispatcher*.so
+
+.venv/
+venv/
