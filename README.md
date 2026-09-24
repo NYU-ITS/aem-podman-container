@@ -18,6 +18,26 @@ Project investigating containerizing AEM utilizing Podman and Podman-Compose
 - Disk: 50 GB+
 
 
+## Run
+
+### `author`-only
+
+To spin up only an instance of the author, the default `compose.yml` file is used by default. In the terminal run
+
+`podman compose build` to build the images, then
+
+`podman compose up` or `podman compose up -d` to run it in a detached state.
+
+
+### `author`, `publish`, and `dispatcher` cluster
+
+To spin up the entire cluster, composed of `author`, `publish`, and `dispatch` services, run:
+
+`podman compose -f compose.cluster.yml build` 
+
+`podman compose -f compose.cluster.yml up`
+
+
 
 ## TODOs
 
