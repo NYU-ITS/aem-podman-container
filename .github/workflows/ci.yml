@@ -36,6 +36,9 @@ jobs:
       - name: Validate Compose File Syntax
         run: podman compose config
 
+      - name: Validate Cluster Compose File Syntax
+        run: podman compose -f compose.cluster.yml config
+
   build-and-test:
     name: Build & Smoke Test
     needs: lint-and-validate
