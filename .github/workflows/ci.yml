@@ -95,11 +95,11 @@ jobs:
           ls -lh AEM_6.5_Quickstart.jar
 
       # Download from S3 (Only runs if the JAR isn't already cached)
-      - name: Download dispatcher module from S3
-        if: steps.cache-dispatcher.outputs.cache-hit != 'true'
-        run: |
-          aws s3 cp s3://aem-s3-resources-bucket-653714463152-us-east-2-an/dispatcher-apache2.4-4.3.8.so dispatcher/modules/dispatcher-apache2.4.so
-          ls -lh dispatcher/modules/dispatcher-apache2.4.so
+      # - name: Download dispatcher module from S3
+      #   if: steps.cache-dispatcher.outputs.cache-hit != 'true'
+      #   run: |
+      #     aws s3 cp s3://aem-s3-resources-bucket-653714463152-us-east-2-an/dispatcher-apache2.4-4.3.8.so dispatcher/modules/dispatcher-apache2.4.so
+      #     ls -lh dispatcher/modules/dispatcher-apache2.4.so
 
       # Start the rootless Podman API socket daemon in CI
       - name: Start Podman API Socket
@@ -131,3 +131,96 @@ jobs:
       - name: Teardown Containers
         if: always()
         run: podman compose down -v
+
+  build-and-test-cluster:
+    name: Build & Smoke Test Whole Cluster
+    needs: lint-and-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install podman-compose
+        run: pip install podman-compose
+
+      - name: Copy Example Environment File
+        run: cp -n example.password.properties password.properties || true
+
+      # --- 1. INJECT LICENSE FILE ---
+      - name: Inject License File
+        run: |
+          echo "${{ secrets.AEM_LICENSE }}" > license.properties
+          # Optional check to ensure it wrote successfully
+          test -s license.properties || echo "Warning: License file is empty"
+
+      # --- 2. CACHE & DOWNLOAD AEM JAR ---
+      - name: Cache AEM Quickstart JAR
+        id: cache-aem
+        uses: actions/cache@v4
+        with:
+          path: AEM_6.5_Quickstart.jar
+          # If you upgrade AEM versions, change this key to bust the cache (e.g., aem-jar-6.5.1)
+          key: aem-jar-6.5.0
+
+      # --- CACHE & DOWNLOAD dispatcher module ---
+      - name: Cache dispatcher module
+        id: cache-dispatcher
+        uses: actions/cache@v4
+        with:
+          path: dispatcher/modules/dispatcher-apache2.4.so
+          # If you upgrade AEM versions, change this key to bust the cache (e.g., aem-jar-6.5.1)
+          key: dispatcher-apache2.4-4.3.8
+
+      # Authenticate to AWS (Only runs if the JAR isn't already cached)
+      - name: Configure AWS Credentials
+        if: steps.cache-aem.outputs.cache-hit != 'true' || steps.cache-dispatcher.outputs.cache-hit != 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      # Download from S3 (Only runs if the JAR isn't already cached)
+      - name: Download AEM JAR from S3
+        if: steps.cache-aem.outputs.cache-hit != 'true'
+        run: |
+          aws s3 cp s3://aem-s3-resources-bucket-653714463152-us-east-2-an/AEM_6.5_Quickstart.jar AEM_6.5_Quickstart.jar
+          ls -lh AEM_6.5_Quickstart.jar
+
+      # Download from S3 (Only runs if the JAR isn't already cached)
+      - name: Download dispatcher module from S3
+        if: steps.cache-dispatcher.outputs.cache-hit != 'true'
+        run: |
+          aws s3 cp s3://aem-s3-resources-bucket-653714463152-us-east-2-an/dispatcher-apache2.4-4.3.8.so dispatcher/modules/dispatcher-apache2.4.so
+          ls -lh dispatcher/modules/dispatcher-apache2.4.so
+
+      # Start the rootless Podman API socket daemon in CI
+      - name: Start Podman API Socket
+        run: |
+          systemctl --user enable --now podman.socket
+          echo "DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock" >> $GITHUB_ENV
+
+      # 3. Build containers locally without pushing to a registry
+      - name: Build and Start Containers
+        run: podman compose -f compose.cluster.yml up -d --build
+
+      # 4. Verify container health & status
+      - name: Check Container Status
+        run: |
+          echo "Waiting for services to stabilize..."
+          sleep 60
+          podman compose -f compose.cluster.yml ps
+
+      # - name: Verify Web/API Service (Smoke Test)
+      #   run: |
+      #     # Replace port 8080 or URL with your application's health endpoint
+      #     curl --fail --retry 5 --retry-delay 3 http://localhost:8080 || {
+      #       echo "Smoke test failed. Container logs:"
+      #       podman compose logs
+      #       exit 1
+      #     }
+
+      # 5. Clean up environment
+      - name: Teardown Containers
+        if: always()
+        run: podman compose -f compose.cluster.yml down -v
