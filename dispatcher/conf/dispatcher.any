@@ -59,7 +59,7 @@
             # Deny content grabbing for /content
             /0082 {
                 /type "deny"
-                /path "/content"
+                /path "/content/*"
                 /selectors '(feed|rss|pages|languages|blueprint|infinity|tidy)'
                 /extension '(json|xml|html)'
             }
