@@ -5,7 +5,7 @@ services:
   aem-author:
     build:
       context: .
-      dockerfile: containerfile
+      dockerfile: Containerfile
       args:
         RUN_MODE: author
         PORT: 4502
@@ -27,7 +27,7 @@ services:
   aem-publish:
     build:
       context: .
-      dockerfile: containerfile
+      dockerfile: Containerfile
       args:
         RUN_MODE: publish
         PORT: 4503
@@ -55,7 +55,7 @@ services:
   aem-dispatcher:
     build:
       context: ./dispatcher
-      dockerfile: containerfile
+      dockerfile: Containerfile
     container_name: aem-dispatcher
     ports:
       - "8080:80"  # Mapped to 8080 locally to avoid root port conflicts on Mac

@@ -5,7 +5,7 @@ services:
   aem-author:
     build:
       context: .
-      dockerfile: containerfile
+      dockerfile: Containerfile
       args:
         RUN_MODE: author
         PORT: 4502

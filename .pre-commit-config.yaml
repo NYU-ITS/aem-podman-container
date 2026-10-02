@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: hadolint
         name: Lint Containerfile
-        files: '(^|/)(containerfile|dockerfile)(\..*)?$'
+        files: '(^|/)(Containerfile|Dockerfile)(\..*)?$'
         types: [file]
 
   - repo: https://github.com/adrienverge/yamllint
