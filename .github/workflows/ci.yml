@@ -111,14 +111,14 @@ jobs:
           sleep 60
           podman compose ps
 
-      # - name: Verify Web/API Service (Smoke Test)
-      #   run: |
-      #     # Replace port 8080 or URL with your application's health endpoint
-      #     curl --fail --retry 5 --retry-delay 3 http://localhost:8080 || {
-      #       echo "Smoke test failed. Container logs:"
-      #       podman compose logs
-      #       exit 1
-      #     }
+      - name: Verify Web/API Service (Smoke Test)
+        run: |
+          # Replace port 8080 or URL with your application's health endpoint
+          curl --fail --retry 5 --retry-delay 3 http://localhost:4502/libs/granite/core/content/login.html || {
+            echo "Smoke test failed. Container logs:"
+            podman compose logs
+            exit 1
+          }
 
       # 5. Clean up environment
       - name: Teardown Containers
@@ -204,14 +204,14 @@ jobs:
           sleep 60
           podman compose -f compose.cluster.yml ps
 
-      # - name: Verify Web/API Service (Smoke Test)
-      #   run: |
-      #     # Replace port 8080 or URL with your application's health endpoint
-      #     curl --fail --retry 5 --retry-delay 3 http://localhost:8080 || {
-      #       echo "Smoke test failed. Container logs:"
-      #       podman compose logs
-      #       exit 1
-      #     }
+      - name: Verify Web/API Service (Smoke Test)
+        run: |
+          # Replace port 8080 or URL with your application's health endpoint
+          curl --fail --retry 5 --retry-delay 3 http://localhost:8080/libs/granite/core/content/login.html || {
+            echo "Smoke test failed. Container logs:"
+            podman compose logs
+            exit 1
+          }
 
       # 5. Clean up environment
       - name: Teardown Containers
