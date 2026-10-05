@@ -106,7 +106,10 @@ jobs:
 
       # 4. Verify container health & status
       - name: Check Container Status
-        run: podman compose ps
+        run: |
+          echo "Waiting for services to stabilize..."
+          sleep 10
+          podman compose ps
 
       - name: Verify Web/API Service (Smoke Test)
         run: |
@@ -195,7 +198,10 @@ jobs:
 
       # 4. Verify container health & status
       - name: Check Container Status
-        run: podman compose -f compose.cluster.yml ps
+        run: |
+          echo "Waiting for services to stabilize..."
+          sleep 10
+          podman compose ps
 
       - name: Verify Web/API Service (Smoke Test)
         run: |
