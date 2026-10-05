@@ -4,33 +4,12 @@ FROM httpd:2.4-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     libssl-dev \
-    # ca-certificates \
-    # wget \
-    # file \
     && rm -rf /var/lib/apt/lists/*
-
-# 2. Install libssl1.1 (Required by x86_64 Adobe Dispatcher 4.3.8)
-# RUN ARCH=$(dpkg --print-architecture) && \
-#     if [ "$ARCH" = "arm64" ]; then \
-#       URL="http://ports.ubuntu.com/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_arm64.deb"; \
-#     else \
-#       URL="http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb"; \
-#     fi && \
-#     wget -q "$URL" -O /tmp/libssl1.1.deb && \
-#     dpkg -i /tmp/libssl1.1.deb && \
-#     rm /tmp/libssl1.1.deb
 
 # Copy dispatcher module and configurations
 COPY modules/dispatcher-apache2.4.so /usr/local/apache2/modules/mod_dispatcher.so
 COPY conf/dispatcher.any /usr/local/apache2/conf/dispatcher.any
 COPY conf/dispatcher.conf /usr/local/apache2/conf/extra/dispatcher.conf
-
-# Set explicit read/execute permissions and print debug checks during CI build
-# RUN chmod 755 /usr/local/apache2/modules/mod_dispatcher.so && \
-#     echo "=== CHECKING MODULE ARCHITECTURE ===" && \
-#     file /usr/local/apache2/modules/mod_dispatcher.so && \
-#     echo "=== CHECKING LINKED DEPENDENCIES ===" && \
-#     ldd /usr/local/apache2/modules/mod_dispatcher.so
 
 # Include custom dispatcher config into Apache's main httpd.conf
 RUN echo "Include conf/extra/dispatcher.conf" >> /usr/local/apache2/conf/httpd.conf

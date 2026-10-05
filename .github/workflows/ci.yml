@@ -192,27 +192,16 @@ jobs:
           systemctl --user enable --now podman.socket
           echo "DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock" >> $GITHUB_ENV
 
-      - name: Build Author
-        run: podman compose -f compose.cluster.yml build aem-author
-
-      - name: Build Publish
-        run: podman compose -f compose.cluster.yml build aem-publish
-
-      - name: Build Dispatcher
-        run: podman compose -f compose.cluster.yml build aem-dispatcher
-
-      - name: Start Containers
-        run: podman compose -f compose.cluster.yml up -d
       # 3. Build containers locally without pushing to a registry
-      # - name: Build and Start Containers
-      #   run: podman compose -f compose.cluster.yml up -d --build
+      - name: Build and Start Containers
+        run: podman compose -f compose.cluster.yml up -d --build
 
       # 4. Verify container health & status
       - name: Check Container Status
         run: |
           echo "Waiting for services to stabilize..."
-          podman compose -f compose.cluster.yml ps -a
-          sleep 120
+          # podman compose -f compose.cluster.yml ps -a
+          # sleep 120
           podman compose -f compose.cluster.yml ps -a
           podman logs aem-dispatcher
 
