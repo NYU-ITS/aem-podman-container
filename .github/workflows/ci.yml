@@ -113,7 +113,6 @@ jobs:
 
       - name: Verify Web/API Service (Smoke Test)
         run: |
-          # Replace port 8080 or URL with your application's health endpoint
           curl --fail --retry 5 --retry-delay 3 http://localhost:4502/libs/granite/core/content/login.html || {
             echo "Smoke test failed. Container logs:"
             podman compose logs
@@ -206,7 +205,6 @@ jobs:
 
       - name: Verify Web/API Service (Smoke Test)
         run: |
-          # Replace port 8080 or URL with your application's health endpoint
           curl --fail --retry 5 --retry-delay 3 http://localhost:8080/libs/granite/core/content/login.html || {
             echo "Smoke test failed. Container logs:"
             podman compose logs
