@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dispatcher module and configurations
-COPY modules/dispatcher*.so /usr/local/apache2/modules/mod_dispatcher.so
+COPY modules/dispatcher-apache2.4.so /usr/local/apache2/modules/mod_dispatcher.so
 COPY conf/dispatcher.any /usr/local/apache2/conf/dispatcher.any
 COPY conf/dispatcher.conf /usr/local/apache2/conf/extra/dispatcher.conf
 
