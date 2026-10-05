@@ -202,7 +202,7 @@ jobs:
         run: |
           echo "Waiting for services to stabilize..."
           sleep 120
-          podman compose -f compose.cluster.yml ps
+          podman compose -f compose.cluster.yml ps -a
 
       - name: Verify Web/API Service (Smoke Test)
         run: |
