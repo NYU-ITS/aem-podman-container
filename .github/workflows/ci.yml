@@ -201,7 +201,7 @@ jobs:
       - name: Check Container Status
         run: |
           echo "Waiting for services to stabilize..."
-          sleep 60
+          sleep 120
           podman compose -f compose.cluster.yml ps
 
       - name: Verify Web/API Service (Smoke Test)
