@@ -9,6 +9,7 @@ services:
       args:
         RUN_MODE: author
         PORT: 4502
+        CONTENT: ${AEM_CONTENT_TYPE:-nosamplecontent}
     container_name: aem-author
     ports:
       - "4502:4502"
@@ -37,6 +38,7 @@ services:
       args:
         RUN_MODE: publish
         PORT: 4503
+        CONTENT: ${AEM_CONTENT_TYPE:-nosamplecontent}
     container_name: aem-publish
     ports:
       - "4503:4503"

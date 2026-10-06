@@ -4,6 +4,7 @@ FROM eclipse-temurin:11-jdk-jammy AS builder
 # 1. Declare build arguments with Author defaults
 ARG RUN_MODE=author
 ARG PORT=4502
+ARG CONTENT=samplecontent
 
 RUN apt-get update && apt-get install -y curl --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
@@ -18,7 +19,7 @@ RUN java -jar /opt/aem/aem.jar -unpack -nointeractive && \
     rm -f /opt/aem/aem.jar
 
 # 2. Warm-Boot using parameterized RUN_MODE and PORT
-RUN java -Xmx4096m -Djava.awt.headless=true -Dsling.run.modes=${RUN_MODE},nosamplecontent \
+RUN java -Xmx4096m -Djava.awt.headless=true -Dsling.run.modes=${RUN_MODE},${CONTENT} \
     -jar /opt/aem/crx-quickstart/app/*.jar -p ${PORT} -nofork & \
     PID=$! && \
     echo "Waiting for AEM (${RUN_MODE}) to complete initial setup on port ${PORT}..." && \
