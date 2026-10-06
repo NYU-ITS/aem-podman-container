@@ -8,7 +8,7 @@
         }
         # backend routing - tells apache where AEM instances live
         /renders {
-            /rend01 {
+            /publish {
             # Points directly to the container name in podman-compose
             /hostname "aem-publish"
             /port "4503"
@@ -110,6 +110,31 @@
                 }
                 /0003 {
                     /glob "*/analytics.sitecatalyst.js"
+                    /type "allow"
+                }
+            }
+
+            # ----------------------------------------------------------------
+            # CACHE FLUSH AUTHORIZATION
+            #
+            # AEM Publish (10.89.0.5) is the only container permitted to
+            # issue Dispatcher flush/invalidation requests.
+            #
+            # 10.89.0.5 is currently the Podman-assigned IP of aem-publish.
+            # If you make Publish's IP static in Compose, keep this exact
+            # value and it will remain stable.
+            # ----------------------------------------------------------------
+            /allowedClients {
+
+                # Deny all clients by default.
+                /0000 {
+                    /glob "*.*.*.*"
+                    /type "deny"
+                }
+
+                # AEM Publish.
+                /0001 {
+                    /glob "10.89.0.5"
                     /type "allow"
                 }
             }
