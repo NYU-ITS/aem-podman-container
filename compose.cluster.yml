@@ -27,6 +27,9 @@ services:
       - aem-author-repo:/opt/aem/crx-quickstart/repository:Z
       - aem-author-logs:/opt/aem/crx-quickstart/logs:Z
       - ./install/author:/opt/aem/crx-quickstart/install:Z
+    networks:
+      aem:
+        ipv4_address: 10.89.0.6
 
   # -------------------------------------------------------------------
   # AEM PUBLISH
@@ -56,6 +59,9 @@ services:
       - aem-publish-repo:/opt/aem/crx-quickstart/repository:Z
       - aem-publish-logs:/opt/aem/crx-quickstart/logs:Z
       - ./install/publish:/opt/aem/crx-quickstart/install:Z
+    networks:
+      aem:
+        ipv4_address: 10.89.0.5
 
   # -------------------------------------------------------------------
   # AEM DISPATCHER (Apache Web Server)
@@ -67,11 +73,20 @@ services:
     container_name: aem-dispatcher
     ports:
       - "8080:80"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     depends_on:
       aem-publish:
         condition: service_healthy
     volumes:
       - dispatcher-cache:/usr/local/apache2/htdocs/cache:Z
+    networks:
+      aem:
+        ipv4_address: 10.89.0.7
 
 volumes:
   aem-author-repo:
@@ -79,3 +94,11 @@ volumes:
   aem-publish-repo:
   aem-publish-logs:
   dispatcher-cache:
+
+networks:
+  aem:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.89.0.0/24
+          gateway: 10.89.0.1
