@@ -18,3 +18,5 @@ dispatcher*.so
 
 .venv/
 venv/
+
+.env
