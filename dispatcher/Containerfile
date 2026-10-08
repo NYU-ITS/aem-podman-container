@@ -16,6 +16,6 @@ RUN echo "Include conf/extra/dispatcher.conf" >> /usr/local/apache2/conf/httpd.c
 
 # Create cache directory and grant write permissions to Apache daemon
 RUN mkdir -p /usr/local/apache2/htdocs/cache && \
-    chown -R daemon:daemon /usr/local/apache2/htdocs/cache
+    chown -R www-data:www-data /usr/local/apache2/htdocs/cache
 
 EXPOSE 80
