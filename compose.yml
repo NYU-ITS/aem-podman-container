@@ -5,22 +5,31 @@ services:
   aem-author:
     build:
       context: .
-      dockerfile: containerfile
+      dockerfile: Containerfile
       args:
         RUN_MODE: author
         PORT: 4502
+        CONTENT: ${AEM_CONTENT_TYPE:-nosamplecontent}
     container_name: aem-author
     ports:
       - "4502:4502"
       - "30333:30333"
     environment:
-      - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dsling.run.modes=author -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30333
-    command: ["-p", "4502", "-nofork"]
+      JAVA_OPTS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Djava.awt.headless=true
+        -XX:+HeapDumpOnOutOfMemoryError
+        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30333
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4502/libs/granite/core/content/login.html"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
     volumes:
-      - aem-author-repo:/opt/aem/crx-quickstart/repository:Z
-      - aem-author-logs:/opt/aem/crx-quickstart/logs:Z
+      - aem-author-home:/opt/aem/crx-quickstart:Z
       - ./install/author:/opt/aem/crx-quickstart/install:Z
 
 volumes:
-  aem-author-repo:
-  aem-author-logs:
+  aem-author-home:

@@ -1,13 +1,13 @@
 FROM httpd:2.4-bookworm
 
-# Install required dependencies
+# 1. Install system utilities and inspection tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dispatcher module and configurations
-COPY modules/dispatcher*.so /usr/local/apache2/modules/mod_dispatcher.so
+COPY modules/dispatcher-apache2.4.so /usr/local/apache2/modules/mod_dispatcher.so
 COPY conf/dispatcher.any /usr/local/apache2/conf/dispatcher.any
 COPY conf/dispatcher.conf /usr/local/apache2/conf/extra/dispatcher.conf
 
@@ -16,6 +16,6 @@ RUN echo "Include conf/extra/dispatcher.conf" >> /usr/local/apache2/conf/httpd.c
 
 # Create cache directory and grant write permissions to Apache daemon
 RUN mkdir -p /usr/local/apache2/htdocs/cache && \
-    chown -R daemon:daemon /usr/local/apache2/htdocs/cache
+    chown -R www-data:www-data /usr/local/apache2/htdocs/cache
 
 EXPOSE 80

@@ -5,21 +5,35 @@ services:
   aem-author:
     build:
       context: .
-      dockerfile: containerfile
+      dockerfile: Containerfile
       args:
         RUN_MODE: author
         PORT: 4502
+        CONTENT: ${AEM_CONTENT_TYPE:-nosamplecontent}
     container_name: aem-author
     ports:
       - "4502:4502"
       - "30333:30333"
     environment:
-      - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dsling.run.modes=author -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30333
+      JAVA_OPTS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Djava.awt.headless=true
+        -XX:+HeapDumpOnOutOfMemoryError
+        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30333
     command: ["-p", "4502", "-nofork"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4502/libs/granite/core/content/login.html"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
     volumes:
-      - aem-author-repo:/opt/aem/crx-quickstart/repository:Z
-      - aem-author-logs:/opt/aem/crx-quickstart/logs:Z
+      - aem-author-home:/opt/aem/crx-quickstart:Z
       - ./install/author:/opt/aem/crx-quickstart/install:Z
+    networks:
+      aem:
+        ipv4_address: 10.89.0.6
 
   # -------------------------------------------------------------------
   # AEM PUBLISH
@@ -27,40 +41,70 @@ services:
   aem-publish:
     build:
       context: .
-      dockerfile: containerfile
+      dockerfile: Containerfile
       args:
         RUN_MODE: publish
         PORT: 4503
+        CONTENT: ${AEM_CONTENT_TYPE:-nosamplecontent}
     container_name: aem-publish
     ports:
       - "4503:4503"
       - "30334:30334"
     environment:
-      - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dsling.run.modes=publish -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30334
+      JAVA_OPTS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Djava.awt.headless=true
+        -XX:+HeapDumpOnOutOfMemoryError
+        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:30334
     command: ["-p", "4503", "-nofork"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4503/libs/granite/core/content/login.html"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
     volumes:
-      - aem-publish-repo:/opt/aem/crx-quickstart/repository:Z
-      - aem-publish-logs:/opt/aem/crx-quickstart/logs:Z
+      - aem-publish-home:/opt/aem/crx-quickstart:Z
       - ./install/publish:/opt/aem/crx-quickstart/install:Z
+    networks:
+      aem:
+        ipv4_address: 10.89.0.5
 
   # -------------------------------------------------------------------
   # AEM DISPATCHER (Apache Web Server)
   # -------------------------------------------------------------------
-  dispatcher:
+  aem-dispatcher:
     build:
       context: ./dispatcher
-      dockerfile: containerfile
+      dockerfile: Containerfile
     container_name: aem-dispatcher
     ports:
-      - "8080:80"  # Mapped to 8080 locally to avoid root port conflicts on Mac
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     depends_on:
-      - aem-publish
+      aem-publish:
+        condition: service_healthy
     volumes:
       - dispatcher-cache:/usr/local/apache2/htdocs/cache:Z
+    networks:
+      aem:
+        ipv4_address: 10.89.0.7
 
 volumes:
-  aem-author-repo:
-  aem-author-logs:
-  aem-publish-repo:
-  aem-publish-logs:
+  aem-author-home:
+  aem-publish-home:
   dispatcher-cache:
+
+networks:
+  aem:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.89.0.0/24
+          gateway: 10.89.0.1

@@ -18,7 +18,7 @@ jobs:
       - name: Lint Containerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: containerfile
+          dockerfile: Containerfile
 
       # 2. Install podman-compose and validate compose configuration
       - name: Install podman-compose
@@ -111,14 +111,13 @@ jobs:
           sleep 60
           podman compose ps
 
-      # - name: Verify Web/API Service (Smoke Test)
-      #   run: |
-      #     # Replace port 8080 or URL with your application's health endpoint
-      #     curl --fail --retry 5 --retry-delay 3 http://localhost:8080 || {
-      #       echo "Smoke test failed. Container logs:"
-      #       podman compose logs
-      #       exit 1
-      #     }
+      - name: Verify Web/API Service (Smoke Test)
+        run: |
+          curl --fail --retry 5 --retry-delay 3 http://localhost:4502/libs/granite/core/content/login.html || {
+            echo "Smoke test failed. Container logs:"
+            podman compose logs
+            exit 1
+          }
 
       # 5. Clean up environment
       - name: Teardown Containers
@@ -201,17 +200,16 @@ jobs:
       - name: Check Container Status
         run: |
           echo "Waiting for services to stabilize..."
-          sleep 60
-          podman compose -f compose.cluster.yml ps
+          sleep 10
+          podman compose ps
 
-      # - name: Verify Web/API Service (Smoke Test)
-      #   run: |
-      #     # Replace port 8080 or URL with your application's health endpoint
-      #     curl --fail --retry 5 --retry-delay 3 http://localhost:8080 || {
-      #       echo "Smoke test failed. Container logs:"
-      #       podman compose logs
-      #       exit 1
-      #     }
+      - name: Verify Web/API Service (Smoke Test)
+        run: |
+          curl --fail --retry 5 --retry-delay 3 http://localhost:8080/libs/granite/core/content/login.html || {
+            echo "Smoke test failed. Container logs:"
+            podman compose -f compose.cluster.yml logs
+            exit 1
+          }
 
       # 5. Clean up environment
       - name: Teardown Containers
