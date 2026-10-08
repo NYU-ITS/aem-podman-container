@@ -24,8 +24,8 @@ services:
       retries: 20
       start_period: 60s
     volumes:
-      - aem-author-repo:/opt/aem/crx-quickstart/repository:Z
-      - aem-author-logs:/opt/aem/crx-quickstart/logs:Z
+      - aem-author-home:/opt/aem/crx-quickstart:Z
+      # - aem-author-logs:/opt/aem/crx-quickstart/logs:Z
       - ./install/author:/opt/aem/crx-quickstart/install:Z
     networks:
       aem:
@@ -56,8 +56,8 @@ services:
       retries: 20
       start_period: 60s
     volumes:
-      - aem-publish-repo:/opt/aem/crx-quickstart/repository:Z
-      - aem-publish-logs:/opt/aem/crx-quickstart/logs:Z
+      - aem-publish-home:/opt/aem/crx-quickstart:Z
+      # - aem-publish-logs:/opt/aem/crx-quickstart/logs:Z
       - ./install/publish:/opt/aem/crx-quickstart/install:Z
     networks:
       aem:
@@ -89,10 +89,12 @@ services:
         ipv4_address: 10.89.0.7
 
 volumes:
-  aem-author-repo:
-  aem-author-logs:
-  aem-publish-repo:
-  aem-publish-logs:
+  # aem-author-repo:
+  aem-author-home:
+  # aem-author-logs:
+  # aem-publish-repo:
+  aem-publish-home:
+  # aem-publish-logs:
   dispatcher-cache:
 
 networks:

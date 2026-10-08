@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEM_HOME="/opt/aem"
+QUICKSTART_DIR="${AEM_HOME}/crx-quickstart"
+REPO_DIR="${QUICKSTART_DIR}/repository"
+SEED_DIR="${AEM_HOME}/repository-seed"
+
+echo "Starting AEM..."
+echo "Quickstart directory: ${QUICKSTART_DIR}"
+echo "Repository directory: ${REPO_DIR}"
+
+# ---------------------------------------------------------
+# Initialize the repository only when the volume is empty.
+# ---------------------------------------------------------
+
+mkdir -p "${REPO_DIR}"
+
+if [ -d "${SEED_DIR}" ] && \
+   [ -z "$(ls -A "${REPO_DIR}")" ]; then
+
+    echo "Empty repository volume detected."
+    echo "Seeding pre-built AEM repository state..."
+
+    cp -a "${SEED_DIR}/." "${REPO_DIR}/"
+
+    echo "Repository seeding complete."
+else
+    echo "Existing repository detected. Skipping seed."
+fi
+
+# ---------------------------------------------------------
+# Start AEM with an explicit Sling home.
+# ---------------------------------------------------------
+
+cd "${AEM_HOME}"
+
+exec java ${JAVA_OPTS:-} \
+    -Dsling.home="${QUICKSTART_DIR}" \
+    -jar "${QUICKSTART_DIR}/app/cq-quickstart-6.5.0-standalone-quickstart.jar" \
+    "$@"
